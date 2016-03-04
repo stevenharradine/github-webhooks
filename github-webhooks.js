@@ -3,22 +3,26 @@ var CONFIG  = require("./config"),
     options = {},
     all_repos = []
 
-/*getPage (1, function (repos) {
+getPage (1, function (repos) {
   console.log ("done")
-  traverseRepos (0, repos, function () {
+  traverseRepos (0, repos, function (repo_name) {
+  	if (repo_name.indexOf (CONFIG.GITHUB_REPO_FILTER) == 0) {
+      writeWebHook (CONFIG.GITHUB_ORG, repo_name, CONFIG.WEB_HOOK, function () {})
+    }
+  }, function () {
     console.log ("done")
   })
-})*/
-getWebHooks ("github-webhooks")
-function getWebHooks (name) {
+})
+
+function writeWebHook (org, name, hook, callback) {
   var buffered_out = ""
 
-  console.log ("Reading in " + name + " hook ")
+  console.log ("Adding " + hook + " to " + org + "/" + name + " ")
 
   var post_data = JSON.stringify({
     'name': 'web',
     'config': {
-      'url': CONFIG.WEB_HOOK,
+      'url': hook,
       'content_type': "json"
     }
   });
@@ -26,7 +30,7 @@ function getWebHooks (name) {
   options = {
     host: 'api.github.com',
     port: 443,
-    path: "/repos/stevenharradine/" + name + "/hooks",
+    path: "/repos/" + org + "/" + name + "/hooks",
     method: 'POST',
     headers: {
       'User-Agent': 'github-mfa-checker',
@@ -41,11 +45,7 @@ function getWebHooks (name) {
       buffered_out += chunk
     })
     res.on('end', function () {
-      var json = JSON.parse (buffered_out)
-
-      for (i in json) {
-        console.log (json[i])
-      }
+      callback()
     })
   })
   
@@ -54,12 +54,12 @@ function getWebHooks (name) {
   req.end();
 }
 
-function traverseRepos (index, repos, callback) {
+function traverseRepos (index, repos, calleach, callback) {
   if (index == repos.length) {
     callback ()
   } else {
-    getWebHooks (repos[index].name)
-    traverseRepos (++index, repos, callback)
+  	calleach (repos[index].name)
+    traverseRepos (++index, repos, calleach, callback)
   }
 }
 
