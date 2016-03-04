@@ -1,26 +1,111 @@
-var CONFIG  = require("./config"),
+var CONFIG = require("./config"),
+    ARRAY_UTILS = require("./libs/array"),
     http = require("https"),
     options = {},
-    all_repos = []
+    all_repos = [],
+    delete_hook = false
+
+for (i in process.argv) {
+  if (i >= 2) {
+  	var arg = process.argv[i]
+
+  	if (arg.indexOf ("--") === 0 && arg.indexOf ("=") >= 0) {
+      var arg_split = arg.split("="),
+  	      key = arg_split[0],
+  	      value = arg_split[1]
+
+  	  if (key === "--github-repo-filter") {
+        CONFIG.GITHUB_REPO_FILTER = value
+      } else if (key == "--delete") {
+      	delete_hook = JSON.parse(value)
+      }
+    }
+  }
+}
 
 getPage (1, function (repos) {
   console.log ("done")
   traverseRepos (0, repos, function (repo_name) {
-    if (CONFIG.GITHUB_REPO_FILTER !== undefined) {
+    if (CONFIG.GITHUB_REPO_FILTER !== "undefined") {
       if (repo_name.indexOf (CONFIG.GITHUB_REPO_FILTER) === 0) {
-        writeWebHook (CONFIG.GITHUB_ORG, repo_name, CONFIG.WEB_HOOK, function (output) {
-          console.log (output)
-        })
+        action (repo_name)
       }
     } else {
-      writeWebHook (CONFIG.GITHUB_ORG, repo_name, CONFIG.WEB_HOOK, function (output) {
-        console.log (output)
-      })
+		action (repo_name)
     }
   }, function () {
     console.log ("done")
   })
 })
+
+function action (repo_name) {
+  if (delete_hook) {
+    deleteWebHook (CONFIG.GITHUB_ORG, repo_name, CONFIG.WEB_HOOK, function (output) {
+      console.log (output)
+    })
+  } else {
+    writeWebHook (CONFIG.GITHUB_ORG, repo_name, CONFIG.WEB_HOOK, function (output) {
+      console.log (output)
+    })
+  }
+}
+
+function deleteWebHook (org, name, hook, callback) {
+  var buffered_out = ""
+
+  options = {
+    host: 'api.github.com',
+    port: 443,
+    path: "/repos/" + org + "/" + name + "/hooks",
+    method: 'GET',
+    headers: {
+      'User-Agent': 'github-mfa-checker',
+      'Authorization': 'token ' + CONFIG.GITHUB_TOKEN,
+    }
+  }
+
+  var req = http.request(options, function(res) {
+    res.setEncoding('utf8');
+    res.on('data', function (chunk) {
+      buffered_out += chunk
+    })
+    res.on('end', function () {
+      var json = JSON.parse (buffered_out)
+
+      for (i in json) {
+      	if (json[i].config.url == CONFIG.WEB_HOOK && ARRAY_UTILS.equals (CONFIG.GITHUB_EVENTS, json[i].events)) {
+          deleteWebHookById (org, name, json[i].id, callback)
+        }
+      }
+    })
+  })
+  
+  req.write('{}')
+  req.end()
+}
+
+function deleteWebHookById (org, name, id, callback) {
+  options = {
+    host: 'api.github.com',
+    port: 443,
+    path: "/repos/" + org + "/" + name + "/hooks/" + id,
+    method: 'DELETE',
+    headers: {
+      'User-Agent': 'github-mfa-checker',
+      'Authorization': 'token ' + CONFIG.GITHUB_TOKEN,
+    }
+  }
+
+  var req = http.request(options, function(res) {
+    res.setEncoding('utf8');
+    res.on('end', function () {
+      callback ()
+    })
+  })
+  
+  req.write('{}')
+  req.end()
+}
 
 function writeWebHook (org, name, hook, callback) {
   var buffered_out = ""
@@ -32,8 +117,9 @@ function writeWebHook (org, name, hook, callback) {
     'config': {
       'url': hook,
       'content_type': "json"
-    }
-  });
+    },
+    "events": CONFIG.GITHUB_EVENTS
+  })
 
   options = {
     host: 'api.github.com',
@@ -48,7 +134,7 @@ function writeWebHook (org, name, hook, callback) {
   }
   
   var req = http.request(options, function(res) {
-    res.setEncoding('utf8');
+    res.setEncoding('utf8')
     res.on('data', function (chunk) {
       buffered_out += chunk
     })
@@ -56,10 +142,9 @@ function writeWebHook (org, name, hook, callback) {
       callback (buffered_out)
     })
   })
-  
-  // post the data
-//  req.write(post_data);
-  req.end();
+
+  req.write(post_data)
+  req.end()
 }
 
 function traverseRepos (index, repos, calleach, callback) {
