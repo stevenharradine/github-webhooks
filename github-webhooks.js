@@ -6,8 +6,16 @@ var CONFIG  = require("./config"),
 getPage (1, function (repos) {
   console.log ("done")
   traverseRepos (0, repos, function (repo_name) {
-  	if (repo_name.indexOf (CONFIG.GITHUB_REPO_FILTER) == 0) {
-      writeWebHook (CONFIG.GITHUB_ORG, repo_name, CONFIG.WEB_HOOK, function () {})
+    if (CONFIG.GITHUB_REPO_FILTER !== undefined) {
+      if (repo_name.indexOf (CONFIG.GITHUB_REPO_FILTER) === 0) {
+        writeWebHook (CONFIG.GITHUB_ORG, repo_name, CONFIG.WEB_HOOK, function (output) {
+          console.log (output)
+        })
+      }
+    } else {
+      writeWebHook (CONFIG.GITHUB_ORG, repo_name, CONFIG.WEB_HOOK, function (output) {
+        console.log (output)
+      })
     }
   }, function () {
     console.log ("done")
@@ -45,12 +53,12 @@ function writeWebHook (org, name, hook, callback) {
       buffered_out += chunk
     })
     res.on('end', function () {
-      callback()
+      callback (buffered_out)
     })
   })
   
   // post the data
-  req.write(post_data);
+//  req.write(post_data);
   req.end();
 }
 
