@@ -16,7 +16,7 @@ for (i in process.argv) {
 
       if (key === "--github-repo-filter") {
         CONFIG.GITHUB_REPO_FILTER = value
-      } else if (key == "--delete") {
+      } else if (key === "--delete") {
         delete_hook = JSON.parse(value)
       }
     }
@@ -73,7 +73,7 @@ function deleteWebHook (org, name, hook, callback) {
       var json = JSON.parse (buffered_out)
 
       for (i in json) {
-        if (json[i].config.url == CONFIG.WEB_HOOK && ARRAY_UTILS.equals (CONFIG.GITHUB_EVENTS, json[i].events)) {
+        if (json[i].config.url === CONFIG.WEB_HOOK && ARRAY_UTILS.equals (CONFIG.GITHUB_EVENTS, json[i].events)) {
           deleteWebHookById (org, name, json[i].id, callback)
         }
       }
@@ -184,7 +184,7 @@ function getPage (page_number, callback) {
         all_repos.push (repos_json[i])
       }
 
-      if (repos_json.length == 30) {
+      if (repos_json.length === 30) {
         getPage (++page_number, callback)
       } else {
         callback (all_repos)
