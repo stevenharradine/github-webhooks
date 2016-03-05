@@ -1,4 +1,5 @@
 # github-webhooks
+Adds a web hook to all an organizations github repositories.  Filters can be applied to so only subsets of repositories are affected.
 
 ## usage
 ### clone
