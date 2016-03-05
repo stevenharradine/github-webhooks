@@ -60,7 +60,7 @@ function deleteWebHook (org, name, hook, callback) {
     method: 'GET',
     headers: {
       'User-Agent': 'github-mfa-checker',
-      'Authorization': 'token ' + CONFIG.GITHUB_TOKEN,
+      'Authorization': 'token ' + CONFIG.GITHUB_TOKEN
     }
   }
 
@@ -92,7 +92,7 @@ function deleteWebHookById (org, name, id, callback) {
     method: 'DELETE',
     headers: {
       'User-Agent': 'github-mfa-checker',
-      'Authorization': 'token ' + CONFIG.GITHUB_TOKEN,
+      'Authorization': 'token ' + CONFIG.GITHUB_TOKEN
     }
   }
 
