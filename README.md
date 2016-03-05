@@ -10,13 +10,16 @@ git clone https://github.com/stevenharradine/github-webhooks.git
 cd github-webhooks
 ```
 ### update config.js
- * `GITHUB_TOKEN` (string) - github token
- * `GITHUB_ORG` (strubg) - github organization to run in
- * `WEB_HOOK` (string) - the webhook url to add/delete
- * `GITHUB_REPO_FILTER` (string) - filter repository name by prefix
  * `GITHUB_EVENTS` (array of string) - values maybe found on https://developer.github.com/webhooks/#events
+ * `GITHUB_ORG` (strubg) - github organization to run in
+ * `GITHUB_REPO_FILTER` (string) - filter repository name by prefix
+ * `GITHUB_TOKEN` (string) - github token
+ * `WEB_HOOK` (string) - the webhook url to add/delete
 
 ### run with filters (if needed)
 ```
 node github-webhooks --github-repo-filter=playbook-
 ```
+#### filters
+ * `--delete` - delete the matching hooks
+ * `--github-repo-filter` - filter repository name by prefix (Overrides `GITHUB_REPO_FILTER` in config.js)
