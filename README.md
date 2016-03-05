@@ -22,5 +22,5 @@ cd github-webhooks
 node github-webhooks --github-repo-filter=playbook-
 ```
 #### arguments
- * `--delete` - delete the matching hooks
- * `--github-repo-filter` - filter repository name by prefix (Overrides `GITHUB_REPO_FILTER` in config.js)
+ * `--delete` (boolean) - delete the matching hooks, default false
+ * `--github-repo-filter` (string) - filter repository name by prefix (Overrides `GITHUB_REPO_FILTER` in config.js)
