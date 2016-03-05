@@ -16,10 +16,10 @@ cd github-webhooks
  * `GITHUB_TOKEN` (string) - github token
  * `WEB_HOOK` (string) - the webhook url to add/delete
 
-### run with filters (if needed)
+### run
 ```
 node github-webhooks --github-repo-filter=playbook-
 ```
-#### filters
+#### arguments
  * `--delete` - delete the matching hooks
  * `--github-repo-filter` - filter repository name by prefix (Overrides `GITHUB_REPO_FILTER` in config.js)
