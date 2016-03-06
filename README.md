@@ -6,7 +6,7 @@ Adds a web hook to all an organizations github repositories.  Filters can be app
 ## usage
 ### update config.js
  * `GITHUB_EVENTS` (array of string) - values maybe found on https://developer.github.com/webhooks/#events
- * `GITHUB_ORG` (strubg) - github organization to run in
+ * `GITHUB_ORG` (string) - github organization to run in
  * `GITHUB_REPO_FILTER` (string) - filter repository name by prefix
  * `GITHUB_TOKEN` (string) - github token
  * `WEB_HOOK` (string) - the webhook url to add/delete
